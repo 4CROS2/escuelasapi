@@ -7,7 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 
-Future <void> main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
@@ -19,7 +19,7 @@ Future <void> main() async {
   HydratedBloc.storage = await HydratedStorage.build(
     storageDirectory: kIsWeb ? HydratedStorage.webStorageDirectory : await getApplicationDocumentsDirectory(),
   );
-  
+
   runApp(const MainApp());
 }
 
@@ -31,10 +31,11 @@ class MainApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: providers,
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         theme: ThemeData.light(
-          useMaterial3: true
-        ) ,
-        home: const Home()
+          useMaterial3: true,
+        ),
+        home: const Home(),
       ),
     );
   }
