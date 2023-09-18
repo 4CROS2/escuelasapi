@@ -21,10 +21,12 @@ class _ProductPageState extends State<ProductPage> {
               child: PageView.builder(
             itemCount: state.dataApi!.length,
             itemBuilder: (context, index) {
-              return Hero(
-                tag: widget.id.toString(),
-                child: Image.network(
-                  state.dataApi![widget.product].images[index],
+              return Material(
+                child: Hero(
+                  tag: widget.id.toString(),
+                  child: Image.network(
+                    state.dataApi![widget.product].images[index],
+                  ),
                 ),
               );
             },
