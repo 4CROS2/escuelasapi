@@ -24,14 +24,14 @@ class _ProductsState extends State<Products> {
             children: [
               ...List.generate(state.dataApi.length, (index) {
                 return FutureBuilder(
-                  future: Future.delayed(Duration(milliseconds: 100 * index)),
+                  future: Future.delayed(Duration(milliseconds: 200 * index)),
                   builder: (context, snapshot) {
                     switch (snapshot.connectionState) {
                       case ConnectionState.waiting:
                         return const SizedBox.shrink();
                       default:
                         return AnimatedOpacity(
-                          duration: const Duration(milliseconds: 200) ,
+                          duration: Duration(milliseconds: 700 * index) ,
                           opacity: snapshot.connectionState == ConnectionState.done ? 1 : 0,
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
