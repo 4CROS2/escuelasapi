@@ -19,18 +19,23 @@ class _ProductsState extends State<Products> {
           return MasonryGrid(
             column: 2,
             children: [
-              Container(
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(.12),
-                    blurRadius: 12,
-                    offset: const Offset(2, 10),
-                  )
-                ]),
-                child: Column(
-                  children: [],
-                ),
-              )
+              ...List.generate(state.dataApi.length, (index) {
+                return Container(
+                  clipBehavior: Clip.hardEdge,
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(.12),
+                      blurRadius: 12,
+                      offset: const Offset(2, 10),
+                    )
+                  ]),
+                  child: Column(
+                    children: [
+                      Image.network(state.dataApi[index].images.first)
+                    ],
+                  ),
+                );
+              }),
             ],
           );
         } else if (state is ErrorState) {

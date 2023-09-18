@@ -14,9 +14,8 @@ class AppCubit extends Cubit<AppState> {
   Future<void> getData() async {
     try {
       final response = await http.get(Uri.parse(api));
-      final data = jsonDecode(response.body);
       if (response.statusCode == 200) {
-        final apiModel = Api.fromJson(data[0]);
+        final apiModel =  List<Api>.from(jsonDecode(response.body).map((model) => Api.fromJson(model)));
         emit(InitializedApi(apiModel));
       } else {
         emit(const ErrorState(text: 'Error al obtener los datos de la API 1.'));

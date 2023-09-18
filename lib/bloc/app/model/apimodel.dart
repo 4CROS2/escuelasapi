@@ -59,3 +59,6 @@ class Categoria {
   }
 }
 
+// Ejemplo de uso
+
+
