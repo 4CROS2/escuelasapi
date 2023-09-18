@@ -28,15 +28,7 @@ class _ProductsState extends State<Products> {
                   )
                 ]),
                 child: Column(
-                  children: [
-                    ...state.dataApi.products.map((product) {
-                      return Column(
-                        children: [
-                          Text('')
-                        ],
-                      );
-                    })
-                  ],
+                  children: [],
                 ),
               )
             ],
