@@ -4,15 +4,17 @@ part of 'app_cubit.dart';
 
 class AppState extends Equatable {
   final List<Api>? dataApi;
-  const AppState({this.dataApi});
+  final List<Api>? filteredData;
+  const AppState({this.dataApi, this.filteredData});
 
   @override
-  List<Object> get props => [dataApi!];
+  List<Object> get props => [dataApi!, filteredData!];
 
   AppState copyWith({
     List<Api>? dataApi,
+    List<Api>? filteredData,
   }) {
-    return AppState(dataApi: dataApi ?? this.dataApi);
+    return AppState(dataApi: dataApi ?? this.dataApi, filteredData: filteredData ?? this.filteredData);
   }
 }
 
@@ -21,12 +23,15 @@ final class AppInitial extends AppState {}
 final class InitializedApi extends AppState {
   @override
   final List<Api> dataApi;
+  @override
+  final List<Api> filteredData;
   const InitializedApi(
-    this.dataApi,
+    {required this.dataApi,
+    required this.filteredData,}
   );
 
   @override
-  List<Object> get props => [dataApi];
+  List<Object> get props => [dataApi, filteredData];
 }
 
 final class ErrorState extends AppState {

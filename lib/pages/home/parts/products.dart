@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:collection/collection.dart';
 import 'package:escuelasapi/bloc/app/app_cubit.dart';
 import 'package:escuelasapi/bloc/app/model/apimodel.dart';
 import 'package:escuelasapi/pages/productview/productdetail.dart';
@@ -21,20 +20,20 @@ class _ProductsState extends State<Products> {
   Widget build(BuildContext context) {
     return BlocBuilder<AppCubit, AppState>(
       buildWhen: (previous, current) {
-        return previous.dataApi != current.dataApi;
+        return previous.filteredData != current.filteredData && current is InitializedApi;
       },
       builder: (context, state) {
         if (state is InitializedApi) {
-        Map<String, List<Api>> cat = groupBy(state.dataApi, (product) => product.category.name);
-
+          int produtsLength = state.filteredData.isEmpty ? state.dataApi.length : state.filteredData.length;
+          List<Api> data = state.filteredData.isEmpty ? state.dataApi : state.filteredData;
           return Column(
             children: [
               MasonryGrid(
                 crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
+                mainAxisSpacing: 20,
                 column: 2,
                 children: [
-                  ...List.generate(state.dataApi.length, (index) {
+                  ...List.generate(produtsLength, (index) {
                     return FutureBuilder(
                       future: Future.delayed(Duration(milliseconds: 200 * index)),
                       builder: (context, snapshot) {
@@ -50,47 +49,47 @@ class _ProductsState extends State<Products> {
                                   Navigator.push(
                                     context,
                                     CupertinoPageRoute(
-                                      builder: (context) => ProductPage(product: index, id: state.dataApi[index].id),
+                                      builder: (context) => ProductPage(product: index, id: state.filteredData[index].id),
                                     ),
                                   );
                                 },
                                 child: Material(
                                   child: Hero(
-                                    tag: state.dataApi[index].id.toString(),
+                                    tag: data[index].id.toString(),
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
                                       clipBehavior: Clip.hardEdge,
                                       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: [
                                         BoxShadow(
                                           color: Colors.black.withOpacity(.12),
-                                          blurRadius: 12,
-                                          offset: const Offset(2, 10),
+                                          blurRadius: 6,
+                                          offset: const Offset(2, 2),
                                         )
                                       ]),
                                       child: Column(
                                         children: [
-                                          CachedNetworkImage(
-                                            progressIndicatorBuilder: (context, url, progress) => Center(
-                                              child: CircularProgressIndicator(
-                                                value: progress.downloaded.toDouble(),
-                                              ),
-                                            ),
-                                            imageUrl: state.dataApi[index].images.first,
-                                            errorWidget: (context, url, error) => const Icon(Icons.error),
-                                          ),
-
-                                          /*  ClipRRect(
+                                          ClipRRect(
                                             borderRadius: BorderRadius.circular(7),
-                                            child: 
-                                          ), */
+                                            child: CachedNetworkImage(
+                                              progressIndicatorBuilder: (context, url, progress) => Center(
+                                                child: CircularProgressIndicator(
+                                                  value: progress.downloaded.toDouble(),
+                                                ),
+                                              ),
+                                              imageUrl: data[index].images.first,
+                                              fit: BoxFit.cover,
+                                              errorWidget: (context, url, error) => const Icon(Icons.error),
+                                            ),
+                                          ),
                                           Container(
                                             alignment: Alignment.center,
                                             height: 50,
                                             child: Text(
-                                              state.dataApi[index].title,
+                                              data[index].title,
                                               textAlign: TextAlign.center,
                                               style: GoogleFonts.redHatText(
                                                 textStyle: const TextStyle(
+                                                  fontSize: 14,
                                                   fontWeight: FontWeight.w700,
                                                 ),
                                               ),
