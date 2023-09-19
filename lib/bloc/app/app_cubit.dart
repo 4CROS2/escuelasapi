@@ -15,7 +15,7 @@ class AppCubit extends Cubit<AppState> {
     try {
       final response = await http.get(Uri.parse(api));
       if (response.statusCode == 200) {
-        final apiModel =  List<Api>.from(jsonDecode(response.body).map((model) => Api.fromJson(model)));
+        final apiModel = List<Api>.from(jsonDecode(response.body).map((model) => Api.fromJson(model)));
         emit(InitializedApi(apiModel));
       } else {
         emit(const ErrorState(text: 'Error al obtener los datos de la API 1.'));
@@ -23,5 +23,10 @@ class AppCubit extends Cubit<AppState> {
     } catch (e) {
       emit(ErrorState(text: 'Error al obtener los datos de la API2. $e'));
     }
+  }
+
+  void filterData({required String filter}) {
+    List<String> categories = state.dataApi!.map((product) => product.category.name).toSet().toList();
+    categories.insert(0, 'All');
   }
 }

@@ -6,7 +6,7 @@ class Api {
   final List<String> images;
   final DateTime creationAt;
   final DateTime updatedAt;
-  final Categoria categoria;
+  final Category category;
 
   Api({
     required this.id,
@@ -16,7 +16,7 @@ class Api {
     required this.images,
     required this.creationAt,
     required this.updatedAt,
-    required this.categoria,
+    required this.category,
   });
 
   factory Api.fromJson(Map<String, dynamic> json) {
@@ -28,19 +28,19 @@ class Api {
       images: List<String>.from(json['images']),
       creationAt: DateTime.parse(json['creationAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
-      categoria: Categoria.fromJson(json['category']),
+      category: Category.fromJson(json['category']),
     );
   }
 }
 
-class Categoria {
+class Category {
   final int id;
   final String name;
   final String image;
   final DateTime creationAt;
   final DateTime updatedAt;
 
-  Categoria({
+  Category({
     required this.id,
     required this.name,
     required this.image,
@@ -48,8 +48,8 @@ class Categoria {
     required this.updatedAt,
   });
 
-  factory Categoria.fromJson(Map<String, dynamic> json) {
-    return Categoria(
+  factory Category.fromJson(Map<String, dynamic> json) {
+    return Category(
       id: json['id'],
       name: json['name'],
       image: json['image'],
@@ -58,7 +58,3 @@ class Categoria {
     );
   }
 }
-
-// Ejemplo de uso
-
-
