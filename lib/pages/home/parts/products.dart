@@ -49,26 +49,27 @@ class _ProductsState extends State<Products> {
                                   Navigator.push(
                                     context,
                                     CupertinoPageRoute(
-                                      builder: (context) => ProductPage(product: index, id: state.filteredData[index].id),
+                                      builder: (context) => ProductPage(
+                                          product: index, id: state.filteredData.isNotEmpty ? state.filteredData[index].id : state.dataApi[index].id),
                                     ),
                                   );
                                 },
                                 child: Material(
-                                  child: Hero(
-                                    tag: data[index].id.toString(),
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-                                      clipBehavior: Clip.hardEdge,
-                                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(.12),
-                                          blurRadius: 6,
-                                          offset: const Offset(2, 2),
-                                        )
-                                      ]),
-                                      child: Column(
-                                        children: [
-                                          ClipRRect(
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                                    clipBehavior: Clip.hardEdge,
+                                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(.12),
+                                        blurRadius: 6,
+                                        offset: const Offset(2, 2),
+                                      )
+                                    ]),
+                                    child: Column(
+                                      children: [
+                                        Hero(
+                                          tag: data[index].id.toString(),
+                                          child: ClipRRect(
                                             borderRadius: BorderRadius.circular(7),
                                             child: CachedNetworkImage(
                                               progressIndicatorBuilder: (context, url, progress) => Center(
@@ -81,22 +82,22 @@ class _ProductsState extends State<Products> {
                                               errorWidget: (context, url, error) => const Icon(Icons.error),
                                             ),
                                           ),
-                                          Container(
-                                            alignment: Alignment.center,
-                                            height: 50,
-                                            child: Text(
-                                              data[index].title,
-                                              textAlign: TextAlign.center,
-                                              style: GoogleFonts.redHatText(
-                                                textStyle: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w700,
-                                                ),
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          height: 50,
+                                          child: Text(
+                                            data[index].title,
+                                            textAlign: TextAlign.center,
+                                            style: GoogleFonts.redHatText(
+                                              textStyle: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w700,
                                               ),
                                             ),
-                                          )
-                                        ],
-                                      ),
+                                          ),
+                                        )
+                                      ],
                                     ),
                                   ),
                                 ),

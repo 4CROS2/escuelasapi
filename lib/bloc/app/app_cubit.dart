@@ -28,7 +28,7 @@ class AppCubit extends Cubit<AppState> {
   void filterData({required String filter}) {
     try {
       if (filter.toLowerCase() == 'all') {
-        emit(InitializedApi(dataApi: state.dataApi!, filteredData:[] ));
+        emit(InitializedApi(dataApi: state.dataApi!, filteredData:const [] ));
       } else {
         final filteredData = state.dataApi?.where((element) => element.category.name == filter).toList();
         emit(InitializedApi(dataApi: state.dataApi!, filteredData: filteredData!));
