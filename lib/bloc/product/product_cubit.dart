@@ -13,7 +13,7 @@ class ProductCubit extends Cubit<ProductState> {
     emit(state.copyWith(pageValue: viewportFraction));
   }
 
-  void dominantColor({context, required int imageIndex}) async {
+  /* void dominantColor({context, required int imageIndex}) async {
     List<Color> colors = [];
     AppCubit product = BlocProvider.of<AppCubit>(context);
     bool verification = product.state.filteredData!.isEmpty;
@@ -25,5 +25,5 @@ class ProductCubit extends Cubit<ProductState> {
       itemPosition++;
     }
     emit(state.copyWith(predominantColor: colors));
-  }
+  } */
 }

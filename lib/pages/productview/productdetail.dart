@@ -1,7 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:escuelasapi/bloc/app/app_cubit.dart';
 import 'package:escuelasapi/bloc/product/product_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:palette_generator/palette_generator.dart';
 
 class ProductPage extends StatefulWidget {
   final int product;
@@ -12,11 +16,10 @@ class ProductPage extends StatefulWidget {
   State<ProductPage> createState() => _ProductPageState();
 }
 
-class _ProductPageState extends State<ProductPage> {
+class _ProductPageState extends State<ProductPage> with KeepAliveParentDataMixin {
   final PageController _pageController = PageController(
     viewportFraction: .72,
   );
-  final double pageValue = 0.0;
 
   void _fractionView() {
     ProductCubit page = BlocProvider.of<ProductCubit>(context);
@@ -26,8 +29,8 @@ class _ProductPageState extends State<ProductPage> {
   @override
   void initState() {
     _pageController.addListener(_fractionView);
-    ProductCubit images = BlocProvider.of<ProductCubit>(context);
-    images.dominantColor(context: context, imageIndex: widget.product);
+    /* ProductCubit images = BlocProvider.of<ProductCubit>(context);
+    images.dominantColor(context: context, imageIndex: widget.product); */
     super.initState();
   }
 
@@ -41,12 +44,18 @@ class _ProductPageState extends State<ProductPage> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ProductCubit, ProductState>(
-      builder: (context, state) {
-        List<Color> colors = state.predominantColor;
-        double value = (double.parse(state.pageValue.toStringAsFixed(2)));
+      builder: (context, productState) {
+        final images = BlocProvider.of<AppCubit>(context);
+        final bool verification = images.state.filteredData!.isEmpty;
+        final filterData = verification ? images.state.dataApi : images.state.filteredData;
+        List<Color> scaffoldColors =
+            verification ? images.state.dataApi![widget.product].images.dominanColor : images.state.filteredData![widget.product].images.dominanColor;
+        List<PaletteColor> enfasisColors = filterData![widget.product].images.paletteColors;
+        double value = (double.parse(productState.pageValue.toStringAsFixed(2)));
+        final int firstIndicator = value >= 0 && value <= .98 ? 0 : 1;
+        final int secondIndicator = value >= 0 && value <= .98 ? 1 : 2;
         return Scaffold(
-          backgroundColor:
-              Color.lerp(colors[value >= 0 && value <= .98 ? 0 : 1], colors[value >= 0 && value <= .98 ? 1 : 2], value < .99 ? value : value-1),
+          backgroundColor: Color.lerp(scaffoldColors[firstIndicator], scaffoldColors[secondIndicator], value < .99 ? value : value - 1),
           body: CustomScrollView(
             slivers: [
               SliverPersistentHeader(
@@ -57,9 +66,26 @@ class _ProductPageState extends State<ProductPage> {
                   id: widget.id,
                 ),
               ),
-              SliverList.builder(
-                itemBuilder: (context, index) => Text(
-                  index.toString(),
+              SliverToBoxAdapter(
+                child: Column(
+                  children: [
+                        Text(
+                          filterData[widget.product].title,
+                          style: GoogleFonts.redHatText(
+                            textStyle: TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.w900,
+                              
+                              color: Color.lerp(
+                                enfasisColors[firstIndicator].titleTextColor,
+                                enfasisColors[firstIndicator].titleTextColor,
+                                value < .99 ? value : value - 1,
+                              ),
+                            ),
+                          ),
+                        ),
+                   
+                  ],
                 ),
               )
             ],
@@ -68,6 +94,12 @@ class _ProductPageState extends State<ProductPage> {
       },
     );
   }
+
+  @override
+  void detach() {}
+
+  @override
+  bool get keptAlive => true;
 }
 
 class ProductHeader extends SliverPersistentHeaderDelegate {
@@ -85,6 +117,7 @@ class ProductHeader extends SliverPersistentHeaderDelegate {
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     return BlocBuilder<AppCubit, AppState>(
+      buildWhen: (previous, current) => false,
       builder: (context, apiState) {
         var data = apiState.filteredData!.isEmpty ? apiState.dataApi![product].images : apiState.filteredData![product].images;
         return Container(
@@ -100,38 +133,40 @@ class ProductHeader extends SliverPersistentHeaderDelegate {
           child: BlocBuilder<ProductCubit, ProductState>(
             builder: (context, productState) {
               return PageView.builder(
-                itemCount: data.length,
+                itemCount: data.url.length,
                 controller: pageController,
+                clipBehavior: Clip.none,
                 physics: const BouncingScrollPhysics(),
-                /*  onPageChanged: (value) {
-                  BlocProvider.of<ProductCubit>(context).dominantColor(imageProvider: data[value]);
-                }, */
                 itemBuilder: (context, index) {
-                  final images = data[index];
+                  final images = data.url[index];
                   final tag = index == 0 ? id.toString() : images;
                   final double pageValue = (productState.pageValue - index) / 10;
                   final double percent = (productState.pageValue > index ? 1 - pageValue : 1 + pageValue).clamp(.80, 1);
 
-                  return Material(
-                    color: Colors.transparent,
-                    child: TweenAnimationBuilder(
-                      tween: Tween(begin: percent, end: percent),
-                      duration: const Duration(milliseconds: 70),
-                      builder: (context, value, child) {
-                        return Transform.scale(
-                          scale: value,
-                          child: child,
-                        );
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(27),
-                          child: Hero(
-                            tag: tag,
-                            child: Image.network(
-                              images,
-                              fit: BoxFit.cover,
+                  return TweenAnimationBuilder(
+                    tween: Tween(begin: percent, end: percent),
+                    duration: const Duration(milliseconds: 70),
+                    builder: (context, value, child) {
+                      return Transform.scale(
+                        scale: value,
+                        child: child,
+                      );
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 2),
+                      decoration: BoxDecoration(boxShadow: [BoxShadow(color: data.paletteColors[index].titleTextColor)]),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(27),
+                        child: Hero(
+                          tag: tag,
+                          child: CachedNetworkImage(
+                            imageUrl: images,
+                            fit: BoxFit.cover,
+                            progressIndicatorBuilder: (context, url, progress) => Center(
+                              child: CircularProgressIndicator(
+                                value: progress.downloaded.toDouble(),
+                                color: Colors.black,
+                              ),
                             ),
                           ),
                         ),

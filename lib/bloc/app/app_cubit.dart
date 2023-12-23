@@ -8,15 +8,16 @@ import 'package:http/http.dart' as http;
 part 'app_state.dart';
 
 class AppCubit extends Cubit<AppState> {
-  final String api = 'https://api.escuelajs.co/api/v1/products';
+  final String api = 'https://api.escuelajs.co/api/v1/products?offset=0&limit=20';
   AppCubit() : super(AppInitial());
 
   Future<void> getData() async {
     try {
       final response = await http.get(Uri.parse(api));
       if (response.statusCode == 200) {
-        final apiModel = List<Api>.from(jsonDecode(response.body).map((model) => Api.fromJson(model)));
-        emit(InitializedApi(dataApi: apiModel,filteredData: apiModel));
+        final data = jsonDecode(response.body) as List;
+        final apiModel = await Future.wait(data.map((model) => Api.fromJson(model)));
+        emit(InitializedApi(dataApi: apiModel, filteredData: apiModel));
       } else {
         emit(const ErrorState(text: 'Error al obtener los datos de la API 1.'));
       }
@@ -28,7 +29,7 @@ class AppCubit extends Cubit<AppState> {
   void filterData({required String filter}) {
     try {
       if (filter.toLowerCase() == 'all') {
-        emit(InitializedApi(dataApi: state.dataApi!, filteredData:const [] ));
+        emit(InitializedApi(dataApi: state.dataApi!, filteredData: const []));
       } else {
         final filteredData = state.dataApi?.where((element) => element.category.name == filter).toList();
         emit(InitializedApi(dataApi: state.dataApi!, filteredData: filteredData!));
@@ -36,6 +37,5 @@ class AppCubit extends Cubit<AppState> {
     } catch (e) {
       emit(ErrorState(text: 'error al filtrar: $e'));
     }
-    
   }
 }
